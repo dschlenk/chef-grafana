@@ -85,6 +85,7 @@ module GrafanaCookbook
       request.add_field('Content-Type', 'application/json;charset=utf-8;')
       request.add_field('Accept', 'application/json')
       request.body = payload if payload
+      Chef::Log.debug "request: #{request}"
 
       response = with_limited_retry tries: 10, exceptions: Errno::ECONNREFUSED do
         http.request(request)
