@@ -71,6 +71,7 @@ module GrafanaCookbook
     def do_request(grafana_options, payload=nil)
       session_id = login(grafana_options[:host], grafana_options[:port], grafana_options[:user], grafana_options[:password])
       http = Net::HTTP.new(grafana_options[:host], grafana_options[:port])
+      http.set_debug_output($stdout)
       request = case grafana_options[:method]
                 when 'Post'
                   Net::HTTP::Post.new(grafana_options[:endpoint])
@@ -85,7 +86,7 @@ module GrafanaCookbook
       request.add_field('Content-Type', 'application/json;charset=utf-8;')
       request.add_field('Accept', 'application/json')
       request.body = payload if payload
-      Chef::Log.debug "request: #{request}"
+      Chef::Log.debug "request: #{request.to_s}"
 
       response = with_limited_retry tries: 10, exceptions: Errno::ECONNREFUSED do
         http.request(request)
