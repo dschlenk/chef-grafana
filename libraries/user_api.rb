@@ -15,7 +15,6 @@ module GrafanaCookbook
     end
 
     def update_user_details(user, grafana_options)
-      Chef::Log.debug ("updating user details for #{user}")
       grafana_options[:method] = 'Put'
       grafana_options[:success_msg] = 'The user has been successfully updated.'
       grafana_options[:unknown_code_msg] = 'UserApi::update_user unchecked response code: %{code}'
@@ -36,7 +35,7 @@ module GrafanaCookbook
       # If it fails, that means we have to change password
       grafana_options[:method] = 'Put'
       grafana_options[:success_msg] = 'User\'s password has been successfully updated.'
-      grafana_options[:unknown_code_msg] = 'UserApi::update_user unchecked response code: %{code}'
+      grafana_options[:unknown_code_msg] = 'UserApi::update_user_password unchecked response code: %{code}'
       grafana_options[:endpoint] = '/api/admin/users/' + user[:id].to_s + '/password'
       grafana_options[:accept_header] = 'application/json;charset=utf-8;'
 
@@ -72,7 +71,6 @@ module GrafanaCookbook
     def do_request(grafana_options, payload=nil)
       session_id = login(grafana_options[:host], grafana_options[:port], grafana_options[:user], grafana_options[:password])
       http = Net::HTTP.new(grafana_options[:host], grafana_options[:port])
-      http.set_debug_output($stdout)
       request = case grafana_options[:method]
                 when 'Post'
                   Net::HTTP::Post.new(grafana_options[:endpoint])
@@ -87,7 +85,6 @@ module GrafanaCookbook
       request.add_field('Content-Type', 'application/json;charset=utf-8;')
       request.add_field('Accept', 'application/json')
       request.body = payload if payload
-      Chef::Log.debug "request: #{request.to_s}"
 
       response = with_limited_retry tries: 10, exceptions: Errno::ECONNREFUSED do
         http.request(request)

@@ -83,13 +83,15 @@ action :update do
   users_list.each do |user|
     if user['login'] == old_login
       exists = true
+      # things in new_resource seem to be immutable so we clone it
+      u = new_resource.user.clone
+      u[:id] = user['id']
       new_resource.user[:id] = user['id']
-      Chef::Log.debug("processing user #{new_resource.user}...")
-      converge_by("Updating details for user #{new_resource.user[:login]}") do
-        update_user_details(new_resource.user, grafana_options)
-      end
       converge_by("Updating password for user #{new_resource.user[:login]}") do
-        update_user_password(new_resource.user, grafana_options)
+        update_user_password(u, grafana_options)
+      end
+      converge_by("Updating details for user #{new_resource.user[:login]}") do
+        update_user_details(u, grafana_options)
       end
       if new_resource.user[:isAdmin] != user['isAdmin'] && !new_resource.user[:isAdmin].nil?
         converge_by("Updating permissions for user #{new_resource.user[:login]}") do
