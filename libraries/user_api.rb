@@ -15,10 +15,11 @@ module GrafanaCookbook
     end
 
     def update_user_details(user, grafana_options)
+      Chef::Log.debug ("updating user details for #{user}")
       grafana_options[:method] = 'Put'
       grafana_options[:success_msg] = 'The user has been successfully updated.'
       grafana_options[:unknown_code_msg] = 'UserApi::update_user unchecked response code: %{code}'
-      grafana_options[:endpoint] = '/api/users/' + user[:id].to_s
+      grafana_options[:endpoint] = "/api/users/#{user[:id]}"
       grafana_options[:accept_header] = 'application/json;charset=utf-8;'
 
       do_request(grafana_options, user.to_json)

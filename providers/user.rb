@@ -83,6 +83,7 @@ action :update do
     if user['login'] == old_login
       exists = true
       new_resource.user[:id] = user['id']
+      Chef::Log.debug("processing user #{new_resource.user}...")
       converge_by("Updating details for user #{new_resource.user[:login]}") do
         update_user_details(new_resource.user, grafana_options)
       end
