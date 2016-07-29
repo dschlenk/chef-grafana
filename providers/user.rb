@@ -68,6 +68,7 @@ action :update do
   end
 
   users_list = get_user_list(grafana_options)
+  Chef::Log.debug "Users list: #{users_list}"
   exists = false
 
   # Check wether we have to update user's login
